@@ -287,10 +287,14 @@ static void _finishInitializing(Class cls, Class supercls)
     // mark this class as fully +initialized
     cls->setInitialized();
     classInitLock.notifyAll();
+    //解锁线程占用。
     _setThisThreadIsNotInitializingClass(cls);
     
     // mark any subclasses that were merely waiting for this class
     if (!pendingInitializeMap) return;
+    /*
+     通知所有正等待该类的相关设置完成的子类。
+     */
     pending = (PendingInitialize *)NXMapGet(pendingInitializeMap, cls);
     if (!pending) return;
 
@@ -408,6 +412,9 @@ static void lockAndFinishInitializing(Class cls, Class supercls)
     if (!supercls  ||  supercls->isInitialized()) {
         _finishInitializing(cls, supercls);
     } else {
+        /*
+         这种情况比如：发生在父类的 +initialize 中，创建子类。
+         */
         _finishInitializingAfter(cls, supercls);
     }
 }
@@ -490,6 +497,9 @@ void _class_initialize(Class cls)
 
     // Make sure super is done initializing BEFORE beginning to initialize cls.
     // See note about deadlock above.
+    /*
+     确保在开始调用类的 +initialize 前，先调用父类的 +initialize 方法。
+     */
     supercls = cls->superclass;
     if (supercls  &&  !supercls->isInitialized()) {
         _class_initialize(supercls);
@@ -504,6 +514,7 @@ void _class_initialize(Class cls)
         }
     }
     
+    //当前线程可以正常调用 +initialize 情况。
     if (reallyInitialize) {
         // We successfully set the CLS_INITIALIZING bit. Initialize the class.
         
@@ -519,6 +530,10 @@ void _class_initialize(Class cls)
         // Send the +initialize message.
         // Note that +initialize is sent to the superclass (again) if 
         // this class doesn't implement +initialize. 2157218
+        /*
+         通过消息发送机制，调用 +initialize 方法。
+         由于是消息发送，所以遵循消息转发。
+         */
         if (PrintInitializing) {
             _objc_inform("INITIALIZE: thread %p: calling +[%s initialize]",
                          pthread_self(), cls->nameForLogging());
@@ -553,12 +568,13 @@ void _class_initialize(Class cls)
         @finally
 #endif
         {
+            //无论是否异常都会调用。
             // Done initializing.
             lockAndFinishInitializing(cls, supercls);
         }
         return;
     }
-    
+    //其他线程正在调用 +initialize 情况。
     else if (cls->isInitializing()) {
         // We couldn't set INITIALIZING because INITIALIZING was already set.
         // If this thread set it earlier, continue normally.
@@ -578,7 +594,7 @@ void _class_initialize(Class cls)
             performForkChildInitialize(cls, supercls);
         }
     }
-    
+    //当前线程发现该类对象已调用 +initialize 情况。
     else if (cls->isInitialized()) {
         // Set CLS_INITIALIZING failed because someone else already 
         //   initialized the class. Continue normally.
@@ -589,7 +605,7 @@ void _class_initialize(Class cls)
         //   Skip the ISINITIALIZING clause. Die horribly.
         return;
     }
-    
+    //其他情况报错。
     else {
         // We shouldn't be here. 
         _objc_fatal("thread-safe class init in objc runtime is buggy!");

@@ -128,7 +128,7 @@ static void append_referrer(weak_entry_t *entry, objc_object **new_referrer)
         // This constructed table is invalid, but grow_refs_and_insert
         // will fix it and rehash it.
         for (size_t i = 0; i < WEAK_INLINE_COUNT; i++) {
-            new_referrers[i] = entry->inline_referrers[i];
+            new_referrers[i] = entry->inline_referrers[i];  //使用运算符操作 =
         }
         entry->referrers = new_referrers;
         entry->num_refs = WEAK_INLINE_COUNT;
@@ -155,8 +155,8 @@ static void append_referrer(weak_entry_t *entry, objc_object **new_referrer)
     if (hash_displacement > entry->max_hash_displacement) {
         entry->max_hash_displacement = hash_displacement;
     }
-    weak_referrer_t &ref = entry->referrers[index];
-    ref = new_referrer;
+    weak_referrer_t &ref = entry->referrers[index]; //获取需要插入的对应弱引用表入口的位置[单纯定义，未使用运算符]
+    ref = new_referrer; //使用运算符操作 =
     entry->num_refs++;
 }
 

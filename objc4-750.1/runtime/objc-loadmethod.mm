@@ -45,7 +45,7 @@ struct loadable_category {
 // List of classes that need +load called (pending superclass +load)
 // This list always has superclasses first because of the way it is constructed
 static struct loadable_class *loadable_classes = nil;
-static int loadable_classes_used = 0;
+static int loadable_classes_used = 0;   //可以调用 +load 类的使用数量。
 static int loadable_classes_allocated = 0;
 
 // List of categories that need +load called (pending parent class +load)
@@ -221,6 +221,11 @@ static void call_class_loads(void)
 *
 * Called only by call_load_methods().
 **********************************************************************/
+
+/*
+ 如果有新的分类准备好，且 +load 还没被调用，那么他们会被加入到 loadable_categories 列表后面，
+ 然后通过外部循环重复调用此方法。
+ */
 static bool call_category_loads(void)
 {
     int i, shift;
@@ -253,6 +258,7 @@ static bool call_category_loads(void)
         }
     }
 
+    //将还有未 +load 的分类往前移，使列表元素之间不出现nil值。
     // Compact detached list (order-preserving)
     shift = 0;
     for (i = 0; i < used; i++) {
@@ -264,6 +270,9 @@ static bool call_category_loads(void)
     }
     used -= shift;
 
+    /*
+     拷贝新加入的分类至列表中。
+     */
     // Copy any new +load candidates from the new list to the detached list.
     new_categories_added = (loadable_categories_used > 0);
     for (i = 0; i < loadable_categories_used; i++) {
@@ -348,10 +357,15 @@ void call_load_methods(void)
     void *pool = objc_autoreleasePoolPush();
 
     /*
-     总体t调用顺序为：父类->子类->分类
+     总体调用顺序为：父类->子类->分类；
+     调用方式是获取到函数指针IMP，直接调用。
      */
     do {
         // 1. Repeatedly call class +loads until there aren't any more
+        /*
+         重复调用 call_class_loads 方法，由于多线程的关系，load_images会被其他多个线程调用；
+         且需确保 父类->子类->分类 这种调用顺序。
+         */
         while (loadable_classes_used > 0) {
             call_class_loads();
         }

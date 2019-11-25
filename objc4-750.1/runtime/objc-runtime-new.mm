@@ -2596,7 +2596,7 @@ void _read_images(header_info **hList, uint32_t hCount, int totalClasses, int un
     // Fix up remapped classes
     // Class list and nonlazy class list remain unremapped.
     // Class refs and super refs are remapped for message dispatching.
-    
+    //重映射类引用，类列表、非懒加载类列表不进行映射。
     if (!noClassesRemapped()) {
         for (EACH_HEADER) {
             Class *classrefs = _getObjc2ClassRefs(hi, &count);
@@ -2712,7 +2712,6 @@ void _read_images(header_info **hList, uint32_t hCount, int totalClasses, int un
             
             addClassTableEntry(cls);
             realizeClass(cls);
-            _objc_inform("%s",cls->data()->ro->name);
         }
     }
 
