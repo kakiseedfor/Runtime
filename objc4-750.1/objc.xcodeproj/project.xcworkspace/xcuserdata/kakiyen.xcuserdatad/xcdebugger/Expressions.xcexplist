@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "::_read_images(header_info **, uint32_t, int, int):objc-runtime-new.mm">
+      </ContextState>
+      <ContextState
+         contextName = "list_array_tt&lt;method_t, method_list_t&gt;::attachLists(method_list_t* const*, unsigned int):objc-runtime-new.h">
+         <PersistentStrings>
+            <PersistentString
+               value = "array()">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "::lookUpImpOrForward(Class, SEL, id, bool, bool, bool):objc-runtime-new.mm">
+      </ContextState>
+      <ContextState
+         contextName = "attachCategories(objc_class*, locstamped_category_list_t*, bool):objc-runtime-new.mm">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
