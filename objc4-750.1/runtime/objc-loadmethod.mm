@@ -354,6 +354,10 @@ void call_load_methods(void)
     if (loading) return;
     loading = YES;
 
+    /*
+     为调用 +loads 方法，初始化一个自动释放池，因为此时的主线程还没有被创建
+     返回 EMPTY_POOL_PLACEHOLDER 边界地址
+     */
     void *pool = objc_autoreleasePoolPush();
 
     /*
@@ -376,6 +380,9 @@ void call_load_methods(void)
         // 3. Run more +loads if there are classes OR more untried categories
     } while (loadable_classes_used > 0  ||  more_categories);
 
+    /*
+     从 EMPTY_POOL_PLACEHOLDER 边界地址开始释放自动释放池
+     */
     objc_autoreleasePoolPop(pool);
 
     loading = NO;

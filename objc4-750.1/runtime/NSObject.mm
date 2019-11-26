@@ -638,6 +638,11 @@ struct magic_t {
 };
     
 
+/*
+ 1、自动释放池是一个栈指针列表
+ 2、每个自动释放池对象以双向链表形式连接
+ 3、每当有新的自动释放池对象链接进来时，那么新的会被认为优先使用
+ */
 class AutoreleasePoolPage 
 {
     // EMPTY_POOL_PLACEHOLDER is stored in TLS when exactly one pool is 
@@ -647,27 +652,39 @@ class AutoreleasePoolPage
 #   define EMPTY_POOL_PLACEHOLDER ((id*)1)
 
 #   define POOL_BOUNDARY nil
+    //用于查找在TLS中存储的空内存释放时。
     static pthread_key_t const key = AUTORELEASE_POOL_KEY;
+    
+    /*
+     用来标记是否已释放
+     */
     static uint8_t const SCRIBBLE = 0xA3;  // 0xA3A3A3A3 after releasing
+    
+    /*
+     正常情况下自动释放池对象大小4096
+     */
     static size_t const SIZE = 
 #if PROTECT_AUTORELEASEPOOL
         PAGE_MAX_SIZE;  // must be multiple of vm page size
 #else
         PAGE_MAX_SIZE;  // size and alignment, power of 2
 #endif
-    static size_t const COUNT = SIZE / sizeof(id);
+    static size_t const COUNT = SIZE / sizeof(id);  //每个自动释放池对象可以存储的数量[地址对其]
 
     magic_t const magic;
-    id *next;
-    pthread_t const thread;
-    AutoreleasePoolPage * const parent;
-    AutoreleasePoolPage *child;
+    id *next;   //指向最后push进自动释放池对象的对象的地址
+    pthread_t const thread; //创建自动释放池对象的所在线程
+    AutoreleasePoolPage * const parent; //父节点自动释放池对象
+    AutoreleasePoolPage *child; //子节点自动释放池对象
     uint32_t const depth;
     uint32_t hiwat;
 
     // SIZE-sizeof(*this) bytes of contents follow
 
     static void * operator new(size_t size) {
+        /*
+         创建一个 SIZE 大小的指针，且以 SIZE 大小进行地址对其。
+         */
         return malloc_zone_memalign(malloc_default_zone(), SIZE, SIZE);
     }
     static void operator delete(void * p) {
@@ -749,7 +766,9 @@ class AutoreleasePoolPage
 #endif
     }
 
-
+    /*
+     可存储对象开始地址 = 创建自动释放池对象地址 + 自动释放池对象本身占用空间大小[有成员变量]
+     */
     id * begin() {
         return (id *) ((uint8_t *)this+sizeof(*this));
     }
@@ -796,6 +815,7 @@ class AutoreleasePoolPage
             AutoreleasePoolPage *page = hotPage();
 
             // fixme I think this `while` can be `if`, but I can't prove it
+            //这种情况可能是 释放池分割线POOL_BOUNDARY 从父节点开始，但由于存储的对象较多，一直存到 子节点。
             while (page->empty()) {
                 page = page->parent;
                 setHotPage(page);
@@ -898,6 +918,7 @@ class AutoreleasePoolPage
 
     static inline AutoreleasePoolPage *hotPage() 
     {
+        //更加key值，查找TLS中是否已有自动释放池对象。
         AutoreleasePoolPage *result = (AutoreleasePoolPage *)
             tls_get_direct(key);
         if ((id *)result == EMPTY_POOL_PLACEHOLDER) return nil;
@@ -905,12 +926,14 @@ class AutoreleasePoolPage
         return result;
     }
 
+    //总是将新建的自动释放池设为hotPage
     static inline void setHotPage(AutoreleasePoolPage *page) 
     {
         if (page) page->fastcheck();
         tls_set_direct(key, (void *)page);
     }
 
+    //coldPage其实就是父节点
     static inline AutoreleasePoolPage *coldPage() 
     {
         AutoreleasePoolPage *result = hotPage();
@@ -926,12 +949,15 @@ class AutoreleasePoolPage
 
     static inline id *autoreleaseFast(id obj)
     {
+        /*
+         获取优先使用的自动释放池对象
+         */
         AutoreleasePoolPage *page = hotPage();
-        if (page && !page->full()) {
+        if (page && !page->full()) {    //自动释放池对象未被存储满的情况
             return page->add(obj);
-        } else if (page) {
+        } else if (page) {  //自动释放池对象已存储满的情况
             return autoreleaseFullPage(obj, page);
-        } else {
+        } else {    //尚未创建过自动释放池对象
             return autoreleaseNoPage(obj);
         }
     }
@@ -967,6 +993,9 @@ class AutoreleasePoolPage
             // or pushing the first object into the empty placeholder pool.
             // Before doing that, push a pool boundary on behalf of the pool 
             // that is currently represented by the empty placeholder.
+            /*
+             已在TLS中，设置过没有大小的 EMPTY_POOL_PLACEHOLDER[已定义过，但没有任何对象push进来过]
+             */
             pushExtraBoundary = true;
         }
         else if (obj != POOL_BOUNDARY  &&  DebugMissingPools) {
@@ -984,14 +1013,20 @@ class AutoreleasePoolPage
             // We are pushing a pool with no pool in place,
             // and alloc-per-pool debugging was not requested.
             // Install and return the empty pool placeholder.
+            /*
+             没有在TLS中设置过没有大小的 EMPTY_POOL_PLACEHOLDER[说明第一次定义]
+             */
             return setEmptyPoolPlaceholder();
         }
 
         // We are pushing an object or a non-placeholder'd pool.
 
         // Install the first page.
+        /*
+         当确实有对象push进来时，才真正创建自动释放池对象。
+         */
         AutoreleasePoolPage *page = new AutoreleasePoolPage(nil);
-        setHotPage(page);
+        setHotPage(page);   //将新创建的自动释放池对象存储[覆盖]在TLS中，之后若没有新建的释放池，则优先使用它。
         
         // Push a boundary on behalf of the previously-placeholder'd pool.
         if (pushExtraBoundary) {
@@ -1012,6 +1047,7 @@ class AutoreleasePoolPage
     }
 
 public:
+    //将对象加入自动释放池对象中
     static inline id autorelease(id obj)
     {
         assert(obj);
@@ -1029,6 +1065,9 @@ public:
             // Each autorelease pool starts on a new pool page.
             dest = autoreleaseNewPage(POOL_BOUNDARY);
         } else {
+            /*
+             没有真正创建自动释放池[是一个没有大小的 EMPTY_POOL_PLACEHOLDER]，用来表明外部定义过一个自动释放池。
+             */
             dest = autoreleaseFast(POOL_BOUNDARY);
         }
         assert(dest == EMPTY_POOL_PLACEHOLDER || *dest == POOL_BOUNDARY);
@@ -1060,16 +1099,21 @@ public:
         objc_autoreleasePoolInvalid(token);
     }
     
+    //自动释放池对象被释放
     static inline void pop(void *token) 
     {
         AutoreleasePoolPage *page;
         id *stop;
 
+        /*
+         当前自动释放池已全部pop完情况
+         */
         if (token == (void*)EMPTY_POOL_PLACEHOLDER) {
             // Popping the top-level placeholder pool.
             if (hotPage()) {
                 // Pool was used. Pop its contents normally.
                 // Pool pages remain allocated for re-use as usual.
+                // 开始pop父节点
                 pop(coldPage()->begin());
             } else {
                 // Pool was never used. Clear the placeholder.
@@ -1078,9 +1122,11 @@ public:
             return;
         }
 
+        //获取token所在 自动释放池对象[不一定是正在使用的 自动释放池对象]。
         page = pageForPointer(token);
         stop = (id *)token;
         if (*stop != POOL_BOUNDARY) {
+            //这种情况可能是手动创建 自动释放池对象 的时候，没有插入 释放池分割线。
             if (stop == page->begin()  &&  !page->parent) {
                 // Start of coldest page may correctly not be POOL_BOUNDARY:
                 // 1. top-level pool is popped, leaving the cold page in place
