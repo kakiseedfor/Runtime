@@ -575,6 +575,9 @@ static void _class_resolveClassMethod(Class cls, SEL sel, id inst)
 {
     assert(cls->isMetaClass());
 
+    /*
+     查找是否实现了 +resolveClassMethod 方法;
+     */
     if (! lookUpImpOrNil(cls, SEL_resolveClassMethod, inst, 
                          NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) 
     {
@@ -582,6 +585,9 @@ static void _class_resolveClassMethod(Class cls, SEL sel, id inst)
         return;
     }
 
+    /*
+     
+     */
     BOOL (*msg)(Class, SEL, SEL) = (typeof(msg))objc_msgSend;
     bool resolved = msg(_class_getNonMetaClass(cls, inst), 
                         SEL_resolveClassMethod, sel);

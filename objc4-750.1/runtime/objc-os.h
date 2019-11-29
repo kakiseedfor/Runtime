@@ -53,11 +53,11 @@ static inline size_t word_align(size_t x) {
 // Mix-in for classes that must not be copied.
 class nocopy_t {
   private:
-    nocopy_t(const nocopy_t&) = delete;
-    const nocopy_t& operator=(const nocopy_t&) = delete;
+    nocopy_t(const nocopy_t&) = delete; //禁用默认拷贝构造函数
+    const nocopy_t& operator=(const nocopy_t&) = delete;    //禁用默认赋值函数
   protected:
-    constexpr nocopy_t() = default;
-    ~nocopy_t() = default;
+    constexpr nocopy_t() = default; //表明编译器继续生成默认构造函数
+    ~nocopy_t() = default;  //表明编译器继续生成默认析构函数
 };
 
 

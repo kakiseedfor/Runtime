@@ -1400,6 +1400,9 @@ static void remapClassRef(Class *clsref)
 * Used by +initialize. 
 * Locking: runtimeLock must be read- or write-locked by the caller
 **********************************************************************/
+/*
+ 根据原类 metacls 及 某个类对象inst，返回指向 metacls 原类的类对象。
+ */
 static Class getNonMetaClass(Class metacls, id inst)
 {
     static int total, named, secondary, sharedcache;
@@ -1410,12 +1413,18 @@ static Class getNonMetaClass(Class metacls, id inst)
     total++;
 
     // return cls itself if it's already a non-meta class
+    /*
+     若 metacls 本身是类对象，则直接返回。
+     */
     if (!metacls->isMetaClass()) return metacls;
 
     // metacls really is a metaclass
 
     // special case for root metaclass
     // where inst == inst->ISA() == metacls is possible
+    /*
+     对于 NSObject 的特殊处理
+     */
     if (metacls->ISA() == metacls) {
         Class cls = metacls->superclass;
         assert(cls->isRealized());
@@ -4939,7 +4948,6 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
 
     imp = cache_getImp(cls, sel);
     if (imp){
-        _objc_inform("get method in cache 2!");
         goto done;
     }
 
@@ -4948,7 +4956,6 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
     {
         Method meth = getMethodNoSuper_nolock(cls, sel);
         if (meth) {
-            _objc_inform("get method in table!");
             log_and_fill_cache(cls, meth->imp, sel, inst, cls);
             imp = meth->imp;
             goto done;

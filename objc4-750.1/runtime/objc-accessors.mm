@@ -45,22 +45,34 @@ StripedMap<spinlock_t> CppObjectLocks;
 
 #define MUTABLE_COPY 2
 
+/*
+ 获取属性时调用的方法
+ */
 id objc_getProperty(id self, SEL _cmd, ptrdiff_t offset, BOOL atomic) {
     if (offset == 0) {
         return object_getClass(self);
     }
 
     // Retain release world
+    /*
+     根据偏移量获取对应属性值
+     */
     id *slot = (id*) ((char*)self + offset);
-    if (!atomic) return *slot;
+    if (!atomic) return *slot;  //非原子操作直接返回
         
     // Atomic retain release world
+    /*
+     原子操作时，添加互斥锁
+     */
     spinlock_t& slotlock = PropertyLocks[slot];
     slotlock.lock();
-    id value = objc_retain(*slot);
+    id value = objc_retain(*slot);  //添加引用计数
     slotlock.unlock();
     
     // for performance, we (safely) issue the autorelease OUTSIDE of the spinlock.
+    /*
+     为了表现这种情况，我们让释放池在互斥锁作用域外
+     */
     return objc_autoreleaseReturnValue(value);
 }
 
@@ -77,19 +89,19 @@ static inline void reallySetProperty(id self, SEL _cmd, id newValue, ptrdiff_t o
     id oldValue;
     id *slot = (id*) ((char*)self + offset);
 
-    if (copy) {
+    if (copy) { //浅拷贝
         newValue = [newValue copyWithZone:nil];
-    } else if (mutableCopy) {
+    } else if (mutableCopy) {   //深拷贝
         newValue = [newValue mutableCopyWithZone:nil];
-    } else {
-        if (*slot == newValue) return;
+    } else {    //正常赋值
+        if (*slot == newValue) return;  //赋值前后一样直接返回
         newValue = objc_retain(newValue);
     }
 
-    if (!atomic) {
+    if (!atomic) {  //非原子操作
         oldValue = *slot;
         *slot = newValue;
-    } else {
+    } else {    //原子操作
         spinlock_t& slotlock = PropertyLocks[slot];
         slotlock.lock();
         oldValue = *slot;

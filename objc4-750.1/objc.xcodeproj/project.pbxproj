@@ -117,9 +117,8 @@
 		87BB4EA70EC39854005D08E1 /* objc-probes.d in Sources */ = {isa = PBXBuildFile; fileRef = 87BB4E900EC39633005D08E1 /* objc-probes.d */; };
 		9672F7EE14D5F488007CEC96 /* NSObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9672F7ED14D5F488007CEC96 /* NSObject.mm */; };
 		E8923DA5116AB2820071B552 /* objc-block-trampolines.mm in Sources */ = {isa = PBXBuildFile; fileRef = E8923DA0116AB2820071B552 /* objc-block-trampolines.mm */; };
-		EC5539A22303AE380003F01C /* HelloWorld.m in Sources */ = {isa = PBXBuildFile; fileRef = EC5539A12303AE380003F01C /* HelloWorld.m */; };
-		EC5539A52303B07E0003F01C /* HelloWorld+Category1.m in Sources */ = {isa = PBXBuildFile; fileRef = EC5539A42303B07E0003F01C /* HelloWorld+Category1.m */; };
-		EC5539A82303B08C0003F01C /* HelloWorld+Category2.m in Sources */ = {isa = PBXBuildFile; fileRef = EC5539A72303B08C0003F01C /* HelloWorld+Category2.m */; };
+		EC32D3F62390BEE1001EAD01 /* Rvalue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EC32D3F42390BEE1001EAD01 /* Rvalue.cpp */; };
+		EC32D3F92390F44E001EAD01 /* MsgObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EC32D3F82390F44E001EAD01 /* MsgObject.m */; };
 		EC917DD022EFE3B6005E817A /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = ECB8394022DD82B200E8A27F /* main.mm */; };
 		ECB8392C22DD7F7400E8A27F /* CrashReporterClient.h in Headers */ = {isa = PBXBuildFile; fileRef = ECB8391822DD7F7400E8A27F /* CrashReporterClient.h */; };
 		ECB8392D22DD7F7400E8A27F /* isa.h in Headers */ = {isa = PBXBuildFile; fileRef = ECB8391922DD7F7400E8A27F /* isa.h */; };
@@ -268,12 +267,10 @@
 		E8923D9C116AB2820071B552 /* objc-blocktramps-i386.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = "objc-blocktramps-i386.s"; path = "runtime/objc-blocktramps-i386.s"; sourceTree = "<group>"; };
 		E8923D9D116AB2820071B552 /* objc-blocktramps-x86_64.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = "objc-blocktramps-x86_64.s"; path = "runtime/objc-blocktramps-x86_64.s"; sourceTree = "<group>"; };
 		E8923DA0116AB2820071B552 /* objc-block-trampolines.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "objc-block-trampolines.mm"; path = "runtime/objc-block-trampolines.mm"; sourceTree = "<group>"; };
-		EC5539A02303AE380003F01C /* HelloWorld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HelloWorld.h; sourceTree = "<group>"; };
-		EC5539A12303AE380003F01C /* HelloWorld.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelloWorld.m; sourceTree = "<group>"; };
-		EC5539A32303B07E0003F01C /* HelloWorld+Category1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HelloWorld+Category1.h"; sourceTree = "<group>"; };
-		EC5539A42303B07E0003F01C /* HelloWorld+Category1.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "HelloWorld+Category1.m"; sourceTree = "<group>"; };
-		EC5539A62303B08C0003F01C /* HelloWorld+Category2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HelloWorld+Category2.h"; sourceTree = "<group>"; };
-		EC5539A72303B08C0003F01C /* HelloWorld+Category2.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "HelloWorld+Category2.m"; sourceTree = "<group>"; };
+		EC32D3F42390BEE1001EAD01 /* Rvalue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Rvalue.cpp; sourceTree = "<group>"; };
+		EC32D3F52390BEE1001EAD01 /* Rvalue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Rvalue.hpp; sourceTree = "<group>"; };
+		EC32D3F72390F44E001EAD01 /* MsgObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MsgObject.h; sourceTree = "<group>"; };
+		EC32D3F82390F44E001EAD01 /* MsgObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MsgObject.m; sourceTree = "<group>"; };
 		ECB8391822DD7F7400E8A27F /* CrashReporterClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrashReporterClient.h; sourceTree = "<group>"; };
 		ECB8391922DD7F7400E8A27F /* isa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = isa.h; sourceTree = "<group>"; };
 		ECB8391A22DD7F7400E8A27F /* Block_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Block_private.h; sourceTree = "<group>"; };
@@ -560,12 +557,10 @@
 			isa = PBXGroup;
 			children = (
 				ECB8394022DD82B200E8A27F /* main.mm */,
-				EC5539A02303AE380003F01C /* HelloWorld.h */,
-				EC5539A12303AE380003F01C /* HelloWorld.m */,
-				EC5539A32303B07E0003F01C /* HelloWorld+Category1.h */,
-				EC5539A42303B07E0003F01C /* HelloWorld+Category1.m */,
-				EC5539A62303B08C0003F01C /* HelloWorld+Category2.h */,
-				EC5539A72303B08C0003F01C /* HelloWorld+Category2.m */,
+				EC32D3F52390BEE1001EAD01 /* Rvalue.hpp */,
+				EC32D3F42390BEE1001EAD01 /* Rvalue.cpp */,
+				EC32D3F72390F44E001EAD01 /* MsgObject.h */,
+				EC32D3F82390F44E001EAD01 /* MsgObject.m */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -856,9 +851,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC5539A82303B08C0003F01C /* HelloWorld+Category2.m in Sources */,
-				EC5539A52303B07E0003F01C /* HelloWorld+Category1.m in Sources */,
-				EC5539A22303AE380003F01C /* HelloWorld.m in Sources */,
+				EC32D3F92390F44E001EAD01 /* MsgObject.m in Sources */,
+				EC32D3F62390BEE1001EAD01 /* Rvalue.cpp in Sources */,
 				EC917DD022EFE3B6005E817A /* main.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
