@@ -33166,6 +33166,12 @@ struct __BlockObject__shareBlock_block_impl_0 {
   struct __BlockObject__shareBlock_block_desc_0* Desc;
   NSString *name;
   NSString *country;
+    
+    /*
+     @param fp block函数地址
+     @param desc
+     @param name,country 外部变量
+     */
   __BlockObject__shareBlock_block_impl_0(void *fp, struct __BlockObject__shareBlock_block_desc_0 *desc, NSString *_name, NSString *_country, int flags=0) : name(_name), country(_country) {
     impl.isa = &_NSConcreteStackBlock;
     impl.Flags = flags;
@@ -33185,7 +33191,7 @@ static void __BlockObject__shareBlock_block_dispose_0(struct __BlockObject__shar
 
 static struct __BlockObject__shareBlock_block_desc_0 {
   size_t reserved;
-  size_t Block_size;
+  size_t Block_size;    //block impl的大小
   void (*copy)(struct __BlockObject__shareBlock_block_impl_0*, struct __BlockObject__shareBlock_block_impl_0*);
   void (*dispose)(struct __BlockObject__shareBlock_block_impl_0*);
 } __BlockObject__shareBlock_block_desc_0_DATA = { 0, sizeof(struct __BlockObject__shareBlock_block_impl_0), __BlockObject__shareBlock_block_copy_0, __BlockObject__shareBlock_block_dispose_0};
@@ -33193,7 +33199,16 @@ static struct __BlockObject__shareBlock_block_desc_0 {
 static void _C_BlockObject_shareBlock(Class self, SEL _cmd) {
     NSString *name = (NSString *)&__NSConstantStringImpl__var_folders_fh_cg4p83n93p1b6mxhgpn6dwzc0000gn_T_BlockObject_bfc8f9_mi_0;
     NSString *country = (NSString *)&__NSConstantStringImpl__var_folders_fh_cg4p83n93p1b6mxhgpn6dwzc0000gn_T_BlockObject_bfc8f9_mi_1;
+    
+    /*
+     @param fp block函数地址
+     @param desc block的数据描述
+     @param name,country 捕获外部变量
+     */
     void (*tempBlock)(void) = ((void (*)())&__BlockObject__shareBlock_block_impl_0((void *)__BlockObject__shareBlock_block_func_0, &__BlockObject__shareBlock_block_desc_0_DATA, name, country, 570425344));
+    /*
+     指针类型进行强制转换，或考虑 reinterpret_cast地址类型转换
+     */
     ((void (*)(__block_impl *))((__block_impl *)tempBlock)->FuncPtr)((__block_impl *)tempBlock);
 }
 
