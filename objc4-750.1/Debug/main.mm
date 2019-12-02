@@ -23,6 +23,25 @@ int main(int argc, const char * argv[]) {
         TempMsg(object, @selector(instanceInvocationMethod));
         TempMsg(MsgObject.class, @selector(classInvocationMethod));
         
+        NSLog(@"-------------------------------------------------");
+        
+        objc_super iSuperObj = {
+            object,
+            MsgObject.class
+        };
+        void (*SuperTempMsg)(objc_super *, SEL) = (typeof(SuperTempMsg))objc_msgSendSuper;
+        SuperTempMsg(&iSuperObj, @selector(instanceResolveMethod));
+        SuperTempMsg(&iSuperObj, @selector(instanceInvocationMethod));
+        
+        objc_super CSuperObj = {
+            object.class,
+            object_getClass(MsgObject.class)
+        };
+        SuperTempMsg(&CSuperObj, @selector(classResolveMethod));
+        SuperTempMsg(&CSuperObj, @selector(classInvocationMethod));
+        
+        NSLog(@"-------------------------------------------------");
+        
         char value[] = "Hello, World!";
         Rvalue rvalue;
         rvalue = value;

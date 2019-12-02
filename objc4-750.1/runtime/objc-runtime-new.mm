@@ -4909,7 +4909,6 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
     if (cache) {
         imp = cache_getImp(cls, sel);
         if (imp){
-            _objc_inform("get method in cache 1!");
             return imp;
         }
     }

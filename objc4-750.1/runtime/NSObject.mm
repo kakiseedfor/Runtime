@@ -676,7 +676,7 @@ class AutoreleasePoolPage
     pthread_t const thread; //创建自动释放池对象的所在线程
     AutoreleasePoolPage * const parent; //父节点自动释放池对象
     AutoreleasePoolPage *child; //子节点自动释放池对象
-    uint32_t const depth;
+    uint32_t const depth;   //当前自动释放池对象是第几个节点
     uint32_t hiwat;
 
     // SIZE-sizeof(*this) bytes of contents follow
@@ -1156,6 +1156,9 @@ public:
         } 
         else if (page->child) {
             // hysteresis: keep one empty child if page is more than half full
+            /*
+             当前释放池对象，若已使用一般以上，则保留一个空的子释放池对象。
+             */
             if (page->lessThanHalfFull()) {
                 page->child->kill();
             }

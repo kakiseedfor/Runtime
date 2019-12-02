@@ -120,6 +120,8 @@
 		EC32D3F62390BEE1001EAD01 /* Rvalue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EC32D3F42390BEE1001EAD01 /* Rvalue.cpp */; };
 		EC32D3F92390F44E001EAD01 /* MsgObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EC32D3F82390F44E001EAD01 /* MsgObject.m */; };
 		EC917DD022EFE3B6005E817A /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = ECB8394022DD82B200E8A27F /* main.mm */; };
+		ECA106422394E0CD006E12AE /* SMsgObject.m in Sources */ = {isa = PBXBuildFile; fileRef = ECA106412394E0CD006E12AE /* SMsgObject.m */; };
+		ECA1064723950222006E12AE /* BlockObject.m in Sources */ = {isa = PBXBuildFile; fileRef = ECA1064623950222006E12AE /* BlockObject.m */; };
 		ECB8392C22DD7F7400E8A27F /* CrashReporterClient.h in Headers */ = {isa = PBXBuildFile; fileRef = ECB8391822DD7F7400E8A27F /* CrashReporterClient.h */; };
 		ECB8392D22DD7F7400E8A27F /* isa.h in Headers */ = {isa = PBXBuildFile; fileRef = ECB8391922DD7F7400E8A27F /* isa.h */; };
 		ECB8392E22DD7F7400E8A27F /* Block_private.h in Headers */ = {isa = PBXBuildFile; fileRef = ECB8391A22DD7F7400E8A27F /* Block_private.h */; };
@@ -271,6 +273,11 @@
 		EC32D3F52390BEE1001EAD01 /* Rvalue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Rvalue.hpp; sourceTree = "<group>"; };
 		EC32D3F72390F44E001EAD01 /* MsgObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MsgObject.h; sourceTree = "<group>"; };
 		EC32D3F82390F44E001EAD01 /* MsgObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MsgObject.m; sourceTree = "<group>"; };
+		ECA106402394E0CD006E12AE /* SMsgObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMsgObject.h; sourceTree = "<group>"; };
+		ECA106412394E0CD006E12AE /* SMsgObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SMsgObject.m; sourceTree = "<group>"; };
+		ECA1064523950222006E12AE /* BlockObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlockObject.h; sourceTree = "<group>"; };
+		ECA1064623950222006E12AE /* BlockObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockObject.m; sourceTree = "<group>"; };
+		ECA1064C239506AF006E12AE /* BlockObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockObject.cpp; sourceTree = "<group>"; };
 		ECB8391822DD7F7400E8A27F /* CrashReporterClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrashReporterClient.h; sourceTree = "<group>"; };
 		ECB8391922DD7F7400E8A27F /* isa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = isa.h; sourceTree = "<group>"; };
 		ECB8391A22DD7F7400E8A27F /* Block_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Block_private.h; sourceTree = "<group>"; };
@@ -556,11 +563,16 @@
 		ECB8393F22DD82B200E8A27F /* Debug */ = {
 			isa = PBXGroup;
 			children = (
+				ECA1064C239506AF006E12AE /* BlockObject.cpp */,
 				ECB8394022DD82B200E8A27F /* main.mm */,
 				EC32D3F52390BEE1001EAD01 /* Rvalue.hpp */,
 				EC32D3F42390BEE1001EAD01 /* Rvalue.cpp */,
 				EC32D3F72390F44E001EAD01 /* MsgObject.h */,
 				EC32D3F82390F44E001EAD01 /* MsgObject.m */,
+				ECA106402394E0CD006E12AE /* SMsgObject.h */,
+				ECA106412394E0CD006E12AE /* SMsgObject.m */,
+				ECA1064523950222006E12AE /* BlockObject.h */,
+				ECA1064623950222006E12AE /* BlockObject.m */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -851,6 +863,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECA1064723950222006E12AE /* BlockObject.m in Sources */,
+				ECA106422394E0CD006E12AE /* SMsgObject.m in Sources */,
 				EC32D3F92390F44E001EAD01 /* MsgObject.m in Sources */,
 				EC32D3F62390BEE1001EAD01 /* Rvalue.cpp in Sources */,
 				EC917DD022EFE3B6005E817A /* main.mm in Sources */,

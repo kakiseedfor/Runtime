@@ -5,12 +5,11 @@
 //  Created by kakiYen on 2019/11/29.
 //
 
-#import <Foundation/Foundation.h>
-#import <objc/runtime.h>
+#import "SMsgObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MsgObject : NSObject
+@interface MsgObject : SMsgObject
 
 @end
 
