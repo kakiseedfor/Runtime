@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <objc/message.h>
+#import "BlockObject.h"
 #import "MsgObject.h"
 #import "Rvalue.hpp"
 
@@ -39,6 +40,10 @@ int main(int argc, const char * argv[]) {
         };
         SuperTempMsg(&CSuperObj, @selector(classResolveMethod));
         SuperTempMsg(&CSuperObj, @selector(classInvocationMethod));
+        
+        NSLog(@"-------------------------------------------------");
+        
+        [[[BlockObject alloc] init] shareBlock];
         
         NSLog(@"-------------------------------------------------");
         

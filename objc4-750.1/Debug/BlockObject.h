@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BlockObject : NSObject
 
-+ (void)shareBlock;
+- (void)shareBlock;
 
 @end
 
