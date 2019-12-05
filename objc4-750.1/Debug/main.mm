@@ -43,7 +43,8 @@ int main(int argc, const char * argv[]) {
         
         NSLog(@"-------------------------------------------------");
         
-        [[[BlockObject alloc] init] shareBlock];
+        BlockObject *blockObject = [[BlockObject alloc] init];
+        [blockObject shareBlock];
         
         NSLog(@"-------------------------------------------------");
         

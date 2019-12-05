@@ -11,6 +11,8 @@ typedef struct Temp__BlockObject__shareBlock_block_desc_0 Temp__BlockObject__sha
 
 typedef struct Temp__BlockObject__shareBlock_block_impl_0 Temp__BlockObject__shareBlock_block_impl_0;
 
+typedef struct Temp__Block_byref_tempObject_1 Temp__Block_byref_tempObject_1;
+
 typedef struct Temp__Block_byref_operation_0 Temp__Block_byref_operation_0;
 
 typedef struct Temp__block_impl Temp__block_impl;
@@ -19,6 +21,9 @@ typedef struct Operation {
     int operation;
 }Operation;
 
+/*
+ size = 8 + 4 + 4 + 8
+ */
 struct Temp__block_impl {
     void *isa;
     int Flags;
@@ -26,6 +31,9 @@ struct Temp__block_impl {
     void *FuncPtr;
 };
 
+/*
+ size = 8 + 8 + 4 + 4 + 4 + [地址对齐 +4]
+ */
 struct Temp__Block_byref_operation_0 {
     void *__isa;
     Temp__Block_byref_operation_0 *__forwarding;
@@ -34,14 +42,30 @@ struct Temp__Block_byref_operation_0 {
     int operation;
 };
 
+/*
+ size = 8 + 8 + 4 + 4 + 8 + 8 + 8
+ */
+struct Temp__Block_byref_tempObject_1 {
+    void *__isa;
+    Temp__Block_byref_tempObject_1 *__forwarding;
+    int __flags;
+    int __size;
+    void (*Temp__Block_byref_id_object_copy)(void*, void*);
+    void (*Temp__Block_byref_id_object_dispose)(void*);
+    id tempObject;
+};
+
+/*
+ size = 24 + 8 + 8 + 8 + 8 + 8 + 8
+ */
 struct Temp__BlockObject__shareBlock_block_impl_0 {
     Temp__block_impl impl;
     Temp__BlockObject__shareBlock_block_desc_0* Desc;
-    BlockObject *__strong tempObject;
     BlockObject *const __strong self;
     NSString *__strong name;
     NSString *__strong country;
-    Temp__Block_byref_operation_0 *operation; // by ref
+    Temp__Block_byref_operation_0 *blockoperation; // by ref
+    Temp__Block_byref_tempObject_1 *tempObject; // by ref
 };
 
 struct Temp__BlockObject__shareBlock_block_desc_0 {
@@ -67,11 +91,19 @@ static int Golden_Globe = 6;
      NSMallocBlock[堆区] : 堆块，引用任何外部局部变量[局部静态变量、全局变量除外]。
      NSStackBlock[栈区] : 栈块，引用任何外部局部变量[局部静态变量、全局变量除外]。
      
+     ⚠️MRC模式下:
+     NSStackBlock、NSGlobalBlock、NSMallocBlock三种类型默认都不会调用 -(id)copy 方法，
+     调用了 -(id)copy 方法，被__block 修饰的变量并没有被拷贝，即内部没有调用 Temp__Block_byref_id_object_copy 类似这个方法。
+     
      ⚠️ARC模式下:
      NSStackBlock 默认都会-(id)copy方法，拷贝到 堆区，且将 isa 指针修改为 NSMallocBlock，
                 并将引用的外部变量增加引用计数[如果是通过地址传递的]
      NSGlobalBlock 调用 -(id)copy方法 没有反应，因为本身存在数据常量区，整个程序结束才会释放。
      NSMallocBlock 调用 -(id)copy方法，会增加引用计数。
+     
+     调用 -(id)copy方法的各种情况：
+     1、作为函数参数传递的时候。
+     2、定义的block赋值到某个变量[非__weak]。
      */
     void(^mallocBlock)(void) = self.mallocBlock;
     
@@ -105,15 +137,20 @@ static int Golden_Globe = 6;
     NSString *country = @"Argentina";   //地址传递
     void (^mallocBlock)(void) = nil;
     @autoreleasepool {
-        BlockObject *tempObject = [[BlockObject alloc] init];
+        __block BlockObject *tempObject = [[BlockObject alloc] init];
         mallocBlock = ^{
             operation = 10;
-            NSLog(@"%@",tempObject);
+            NSLog(@"tempObject : %@", tempObject);
             NSLog(@"%d : %d : %@ : %@ : %d",self.age, caree, name, country, operation);
             NSLog(@"%p : %p : %p : %p : %p : %p",&self->_age, &caree, name, country, &Golden_Globe, &operation);
-        };
+        };  //ARC模式下会调用 -(id)copy 方法后赋值给变量。[类似定义普通对象的变量后，调用 -(id)retain]
+        
+        /*
+         ARC下，这里开始，所有被 block 捕获的变量已被拷贝的堆区中[有些变量本身就在堆中创建，所以只会拷贝指针]，
+         无论是后续的操作还是在块中的操作的变量，都是操作拷贝的堆中的内容。
+         */
     }
-    NSLog(@"block after %p", &operation);
+    NSLog(@"block after %p", &operation);   //operation->__forwarding 指向堆中的内容，所以修改的是堆中的内容。
     
     _age = 15;
     caree = 5;
