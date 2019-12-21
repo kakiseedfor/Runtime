@@ -561,7 +561,7 @@ struct class_ro_t {
     const uint8_t * ivarLayout;
     
     const char * name;
-    method_list_t * baseMethodList;
+    method_list_t * baseMethodList; //或者是类对象的对象方法，或者是原类对象的类方法。
     protocol_list_t * baseProtocols;
     const ivar_list_t * ivars;
 
@@ -593,7 +593,7 @@ template <typename Element, typename List>
 class list_array_tt {
     struct array_t {
         uint32_t count;
-        List* lists[0];
+        List* lists[0]; //或者是类对象的对象方法，或者是原类对象的类方法。
 
         static size_t byteSize(uint32_t count) {
             return sizeof(array_t) + count*sizeof(lists[0]);
@@ -842,7 +842,7 @@ struct class_rw_t {
 
     const class_ro_t *ro;
 
-    method_array_t methods;
+    method_array_t methods; //或者是类对象的对象方法，或者是原类对象的类方法。
     property_array_t properties;
     protocol_array_t protocols;
 

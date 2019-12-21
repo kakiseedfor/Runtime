@@ -379,6 +379,9 @@ weak_unregister_no_lock(weak_table_t *weak_table, id referent_id,
             }
         }
 
+        /*
+         若该对象指针的弱引用实体入口已空，则释放该实体入口
+         */
         if (empty) {
             weak_entry_remove(weak_table, entry);
         }
@@ -408,7 +411,7 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
 
     // ensure that the referenced object is viable
     bool deallocating;
-    if (!referent->ISA()->hasCustomRR()) {
+    if (!referent->ISA()->hasCustomRR()) {  // 若该引用是无效的，则标记为正在释放中。
         deallocating = referent->rootIsDeallocating();
     }
     else {
@@ -423,7 +426,7 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
             ! (*allowsWeakReference)(referent, SEL_allowsWeakReference);
     }
 
-    //对象正在释放还在使用弱引用，一般直接Crash掉
+    //对象正在释放却还在使用弱引用，一般直接Crash掉
     if (deallocating) {
         if (crashIfDeallocating) {
             _objc_fatal("Cannot form weak reference to instance (%p) of "

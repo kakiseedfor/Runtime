@@ -2579,7 +2579,13 @@ void _read_images(header_info **hList, uint32_t hCount, int totalClasses, int un
         bool headerIsPreoptimized = hi->isPreoptimized();
 
         for (i = 0; i < count; i++) {
-            Class cls = (Class)classlist[i];
+            Class cls = (Class)classlist[i];    //这里获取的是类对象
+            
+            const class_ro_t *ro = (const class_ro_t *)cls->data();
+            method_list_t *list = ro->baseMethods();
+            if (strcmp(cls->mangledName(), "MsgObject") == 0) {
+                
+            }
             /*
              读取由编译器编译好的类或元类
              */
@@ -2702,6 +2708,12 @@ void _read_images(header_info **hList, uint32_t hCount, int totalClasses, int un
         for (i = 0; i < count; i++) {
             Class cls = remapClass(classlist[i]);
             if (!cls) continue;
+            
+            const class_ro_t *ro = (const class_ro_t *)cls->data();
+            method_list_t *list = ro->baseMethods();
+            if (strstr(cls->mangledName(), "MsgObject")) {
+                
+            }
 
             // hack for class __ARCLite__, which didn't get this above
 #if TARGET_OS_SIMULATOR
@@ -2747,8 +2759,10 @@ void _read_images(header_info **hList, uint32_t hCount, int totalClasses, int un
             category_t *cat = catlist[i];
             Class cls = remapClass(cat->cls);
 
-            if (strcmp(cat->name, "Category1") == 0 || strcmp(cat->name, "Category2") == 0) {
-                _objc_inform("%s", cat->name);
+            const class_ro_t *ro = (const class_ro_t *)cls->data();
+            method_list_t *list = ro->baseMethods();
+            if (strstr(cls->mangledName(), "MsgObject")) {
+                
             }
             if (!cls) {
                 // Category's target class is missing (probably weak-linked).

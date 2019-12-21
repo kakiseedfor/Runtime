@@ -273,16 +273,16 @@ void _object_set_associative_reference(id object, void *key, id value, uintptr_t
     ObjcAssociation old_association(0, nil);
     id new_value = value ? acquireValue(value, policy) : nil;
     {
-        AssociationsManager manager;
-        AssociationsHashMap &associations(manager.associations());
+        AssociationsManager manager;    //对象关联管理器
+        AssociationsHashMap &associations(manager.associations());  //获取全局对象关联Hash表，根据对象地址做Hash函数的地址映射。
         disguised_ptr_t disguised_object = DISGUISE(object);
         if (new_value) {
             // break any existing association.
-            AssociationsHashMap::iterator i = associations.find(disguised_object);
-            if (i != associations.end()) {
+            AssociationsHashMap::iterator i = associations.find(disguised_object);  //根据对象地址获取对象关联表
+            if (i != associations.end()) {  //不是第一次关联的情况
                 // secondary table exists
                 ObjectAssociationMap *refs = i->second;
-                ObjectAssociationMap::iterator j = refs->find(key);
+                ObjectAssociationMap::iterator j = refs->find(key); //根据标识在对象关联表获取对应的关联表
                 if (j != refs->end()) {
                     old_association = j->second;
                     j->second = ObjcAssociation(policy, new_value);
@@ -291,10 +291,10 @@ void _object_set_associative_reference(id object, void *key, id value, uintptr_t
                 }
             } else {
                 // create the new association (first time).
-                ObjectAssociationMap *refs = new ObjectAssociationMap;
+                ObjectAssociationMap *refs = new ObjectAssociationMap;  //第一次关联将新建一个。
                 associations[disguised_object] = refs;
                 (*refs)[key] = ObjcAssociation(policy, new_value);
-                object->setHasAssociatedObjects();
+                object->setHasAssociatedObjects();  //跟新isa_t中的相关标识。
             }
         } else {
             // setting the association to nil breaks the association.
@@ -324,6 +324,9 @@ void _object_remove_assocations(id object) {
         if (i != associations.end()) {
             // copy all of the associations that need to be removed.
             ObjectAssociationMap *refs = i->second;
+            /*
+             存储在该对象地址映射下的所有关联表都将移除。
+             */
             for (ObjectAssociationMap::iterator j = refs->begin(), end = refs->end(); j != end; ++j) {
                 elements.push_back(j->second);
             }

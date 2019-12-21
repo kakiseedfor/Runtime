@@ -13,4 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MsgObject (Catagory)
+
+@end
+
 NS_ASSUME_NONNULL_END

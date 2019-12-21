@@ -328,6 +328,7 @@ storeWeak(id *location, objc_object *newObj)
     }
 
     // Clean up old value, if any.
+    // 接触指向对象指针的指针与原对象指针弱引用关系。
     if (haveOld) {
         weak_unregister_no_lock(&oldTable->weak_table, oldObj, location);
     }
@@ -2051,10 +2052,12 @@ void arr_init(void)
     return self;
 }
 
+//类方法返回类对象自己。
 + (Class)class {
     return self;
 }
 
+//对象方法返回类对象。
 - (Class)class {
     return object_getClass(self);
 }
