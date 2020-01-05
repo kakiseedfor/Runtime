@@ -593,6 +593,7 @@ template <typename Element, typename List>
 class list_array_tt {
     struct array_t {
         uint32_t count;
+        //定义0长度的数组，方便内存释放，及内存扩充。
         List* lists[0]; //或者是类对象的对象方法，或者是原类对象的类方法。
 
         static size_t byteSize(uint32_t count) {
