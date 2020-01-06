@@ -753,7 +753,7 @@ class StripedMap {
 #endif
 
     struct PaddedT {
-        T value alignas(CacheLineSize);
+        alignas(CacheLineSize) T value; //同样是字节对齐，按64位字节对齐
     };
 
     PaddedT array[StripeCount];

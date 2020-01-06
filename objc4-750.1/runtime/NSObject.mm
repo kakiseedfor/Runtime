@@ -163,13 +163,16 @@ void SideTable::unlockTwo<DontHaveOld, DoHaveNew>
 // pointer to this struct because of the extra indirection.
 // Do it the hard way.
 alignas(StripedMap<SideTable>) static uint8_t 
-    SideTableBuf[sizeof(StripedMap<SideTable>)];    //初始化一个大小为 sizeof(StripedMap<SideTable>)，且每个元素大小为 sizeof(StripedMap<SideTable>)的数组 [有点类似二维数组]
+    SideTableBuf[sizeof(StripedMap<SideTable>)];    //初始化一个大小为 sizeof(StripedMap<SideTable>)，数组大小对齐到sizeof(StripedMap<SideTable>)为止
 
 static void SideTableInit() {
     new (SideTableBuf) StripedMap<SideTable>();
 }
 
-//将 SideTableBuf 数组的读取方式改为按 sizeof(StripedMap<SideTable>)大小读取每个元素[默认读取元素的大小为 4096]
+/*
+ 将 SideTableBuf 数组的读取方式改为按 sizeof(StripedMap<SideTable>)大小读取每个元素[默认读取元素的大小为 4096]
+ sizeof(SideTable) = 64，StripedMap.array个数 = 64，所以64 * 64 = 4096。
+ */
 static StripedMap<SideTable>& SideTables() {
     return *reinterpret_cast<StripedMap<SideTable>*>(SideTableBuf);
 }
