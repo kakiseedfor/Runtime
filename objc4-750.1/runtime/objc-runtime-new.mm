@@ -1401,7 +1401,7 @@ static void remapClassRef(Class *clsref)
 * Locking: runtimeLock must be read- or write-locked by the caller
 **********************************************************************/
 /*
- 根据原类 metacls 及 某个类对象inst，返回指向 metacls 原类的类对象。
+ 根据原类 metacls 及 某个类对象，返回指向 metacls 原类的类对象。
  */
 static Class getNonMetaClass(Class metacls, id inst)
 {

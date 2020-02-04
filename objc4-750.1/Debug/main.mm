@@ -17,7 +17,7 @@ int main(int argc, const char * argv[]) {
         NSLog(@"Hello, World!");
         
         MsgObject *object = [[MsgObject alloc] init];
-        void (*TempMsg)(Class, SEL) = (typeof(TempMsg))objc_msgSend;
+        void (*TempMsg)(id, SEL) = (typeof(TempMsg))objc_msgSend;
         TempMsg(object, @selector(instanceResolveMethod));
         TempMsg(MsgObject.class, @selector(classResolveMethod));
         

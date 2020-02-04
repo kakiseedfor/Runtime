@@ -533,6 +533,7 @@ void _class_initialize(Class cls)
         /*
          通过消息发送机制，调用 +initialize 方法。
          由于是消息发送，所以遵循消息转发。
+         所以若分类中实现 +initialize，则不调用本类中的该方法
          */
         if (PrintInitializing) {
             _objc_inform("INITIALIZE: thread %p: calling +[%s initialize]",
@@ -582,6 +583,10 @@ void _class_initialize(Class cls)
         // It's ok if INITIALIZING changes to INITIALIZED while we're here, 
         //   because we safely check for INITIALIZED inside the lock 
         //   before blocking.
+        /*
+         因为类对象的+initialize是通过消息发送的，所以会不断的死循环调用_class_initialize方法
+         但这里做了判断，当前线程是否正在执行 +initialize 方法
+         */
         if (_thisThreadIsInitializingClass(cls)) {
             return;
         } else if (!MultithreadedForkChild) {
