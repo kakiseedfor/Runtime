@@ -120,6 +120,9 @@ static int Golden_Globe = 6;
     
     NSLog(@"-------------------------------------------------");
     
+    /**
+     Temp__BlockObject__shareBlock_block_impl_0指针 转 Temp__block_impl指针
+     */
     Temp__BlockObject__shareBlock_block_impl_0 *block_impl = (__bridge Temp__BlockObject__shareBlock_block_impl_0 *)mallocBlock;
     ((void (*)(Temp__block_impl *))((Temp__block_impl *)block_impl)->FuncPtr)((Temp__block_impl *)block_impl);
 }
@@ -128,10 +131,13 @@ static int Golden_Globe = 6;
  1、定义在栈中的变量，超过作用域时，会被系统自动回收，需主动拷贝一份内容至堆中。
  2、定义为局部静态变量，由于变量的内容是保存在内存中的静态区，内容会一直存在，所以可以通过地址传递达到目的。
  3、定位为全局变量，由于全局变量可以的任意作用域访问，所以无需做任何操作。
+ 4、没有 __block 修饰的变量，不可在Block内修改是因为该变量与Block的栈空间不一样。[也可使用 static 修饰变量达到改变]
  */
 - (void(^)(void))mallocBlock{
     __block int operation = 7;  //值传递
     NSLog(@"block befor %p", &operation);
+    
+    int cityId = 101;
     static int caree = 18;  //地址传递
     NSString *name = @"Messi";  //地址传递
     NSString *country = @"Argentina";   //地址传递

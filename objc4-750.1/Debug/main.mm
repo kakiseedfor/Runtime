@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
         SuperTempMsg(&iSuperObj, @selector(instanceInvocationMethod));
         
         objc_super CSuperObj = {
-            object.class,
+            MsgObject.class,
             object_getClass(MsgObject.class)
         };
         SuperTempMsg(&CSuperObj, @selector(classResolveMethod));
