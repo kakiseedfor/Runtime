@@ -643,7 +643,7 @@ struct magic_t {
     
 
 /*
- 1、自动释放池是一个栈指针列表
+ 1、自动释放池是一个堆指针列表
  2、每个自动释放池对象以双向链表形式连接
  3、每当有新的自动释放池对象链接进来时，那么新的会被认为优先使用
  */
@@ -992,16 +992,15 @@ class AutoreleasePoolPage
         assert(!hotPage());
 
         bool pushExtraBoundary = false;
+        //TLS 中没有找到 EMPTY_POOL_PLACEHOLDER[说明空的线程池标记都没有]
         if (haveEmptyPoolPlaceholder()) {
             // We are pushing a second pool over the empty placeholder pool
             // or pushing the first object into the empty placeholder pool.
             // Before doing that, push a pool boundary on behalf of the pool 
             // that is currently represented by the empty placeholder.
-            /*
-             已在TLS中，设置过没有大小的 EMPTY_POOL_PLACEHOLDER[已定义过，但没有任何对象push进来过]
-             */
             pushExtraBoundary = true;
         }
+        //obj 不是 POOL_BOUNDARY 是错误的
         else if (obj != POOL_BOUNDARY  &&  DebugMissingPools) {
             // We are pushing an object with no pool in place, 
             // and no-pool debugging was requested by environment.
@@ -1017,9 +1016,6 @@ class AutoreleasePoolPage
             // We are pushing a pool with no pool in place,
             // and alloc-per-pool debugging was not requested.
             // Install and return the empty pool placeholder.
-            /*
-             没有在TLS中设置过没有大小的 EMPTY_POOL_PLACEHOLDER[说明第一次定义]
-             */
             return setEmptyPoolPlaceholder();
         }
 
@@ -1070,7 +1066,7 @@ public:
             dest = autoreleaseNewPage(POOL_BOUNDARY);
         } else {
             /*
-             没有真正创建自动释放池[是一个没有大小的 EMPTY_POOL_PLACEHOLDER]，用来表明外部定义过一个自动释放池。
+             没有真正创建自动释放池[是一个没有大小的 EMPTY_POOL_PLACEHOLDER]。
              */
             dest = autoreleaseFast(POOL_BOUNDARY);
         }
@@ -1161,7 +1157,7 @@ public:
         else if (page->child) {
             // hysteresis: keep one empty child if page is more than half full
             /*
-             当前释放池对象，若已使用一般以上，则保留一个空的子释放池对象。
+             当前释放池对象，若已使用一半以上，则保留一个空的子释放池对象。
              */
             if (page->lessThanHalfFull()) {
                 page->child->kill();
