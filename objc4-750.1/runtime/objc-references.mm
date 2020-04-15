@@ -294,7 +294,7 @@ void _object_set_associative_reference(id object, void *key, id value, uintptr_t
                 ObjectAssociationMap *refs = new ObjectAssociationMap;  //第一次关联将新建一个。
                 associations[disguised_object] = refs;
                 (*refs)[key] = ObjcAssociation(policy, new_value);
-                object->setHasAssociatedObjects();  //跟新isa_t中的相关标识。
+                object->setHasAssociatedObjects();  //更新isa_t中的相关标识。
             }
         } else {
             // setting the association to nil breaks the association.

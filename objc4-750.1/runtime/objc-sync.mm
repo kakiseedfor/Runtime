@@ -31,10 +31,10 @@
 
 
 typedef struct alignas(CacheLineSize) SyncData {
-    struct SyncData* nextData;
-    DisguisedPtr<objc_object> object;
-    int32_t threadCount;  // number of THREADS using this block
-    recursive_mutex_t mutex;
+    struct SyncData* nextData;  //下个节点
+    DisguisedPtr<objc_object> object;   //@synchronized (object)，同步对象
+    int32_t threadCount;  // number of THREADS using this block，当前被线程使用的数量，threadCount = 0可以被复用
+    recursive_mutex_t mutex;    //同步对象时关联的锁
 } SyncData;
 
 typedef struct {
@@ -54,11 +54,12 @@ typedef struct SyncCache {
   a single object at a time.
   SYNC_DATA_DIRECT_KEY  == SyncCacheItem.data
   SYNC_COUNT_DIRECT_KEY == SyncCacheItem.lockCount
+  SyncList 链表
  */
 
 struct SyncList {
-    SyncData *data;
-    spinlock_t lock;
+    SyncData *data; //头节点
+    spinlock_t lock;    //操作头节点使用的锁
 
     constexpr SyncList() : data(nil), lock(fork_unsafe_lock) { }
 };

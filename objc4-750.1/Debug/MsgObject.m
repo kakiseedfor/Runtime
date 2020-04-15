@@ -9,11 +9,11 @@
 
 /*
  class_getInstanceVariable 配合 object_getIvar获取成员变量内存空间；
- self.varliable 系统默认实现是直接通过 _varliable 返回的；
- _varliable 直接保存着成员变量内存空间。
+ self.subArray 系统默认实现是直接通过 _subArray 返回的；
+ _subArray 直接保存着成员变量内存空间。
  */
 @interface MsgObject ()
-@property (strong, nonatomic) NSString *varliable;
+@property (strong, nonatomic) NSSet *subSet;
 
 @end
 
@@ -23,7 +23,7 @@
 {
     self = [super init];
     if (self) {
-        self.varliable = @"MsgObject";
+        _subSet = [NSSet setWithObjects:@"Holy", @"Shit", nil];
     }
     return self;
 }
