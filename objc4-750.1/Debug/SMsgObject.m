@@ -104,6 +104,7 @@ static void ResolveMethod(id object, SEL sel){
  */
 @interface SMsgObject ()
 @property (strong, nonatomic) NSArray *superArray;
+@property (strong, nonatomic) NSSet *subSet;
 
 @end
 
@@ -123,6 +124,7 @@ static void ResolveMethod(id object, SEL sel){
             NSString *charArray[] = {@"Fuck", @"Down"};
             CFArrayRef arrayRef = CFArrayCreate(kCFAllocatorDefault, (void *)charArray, (CFIndex)2, NULL);
             _superArray = CFBridgingRelease(arrayRef);  //_superArray = (__bridge_transfer NSArray *)arrayRef
+            _subSet = [NSSet setWithObjects:@"Holy", @"Shit", nil];
         }
         NSLog(@"%@",_superArray.description);
     }

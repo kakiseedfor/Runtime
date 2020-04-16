@@ -7,23 +7,40 @@
 
 #import "MsgObject.h"
 
-/*
- class_getInstanceVariable 配合 object_getIvar获取成员变量内存空间；
- self.subArray 系统默认实现是直接通过 _subArray 返回的；
- _subArray 直接保存着成员变量内存空间。
- */
+@interface TempObject : NSObject
+@property (weak, nonatomic) MsgObject *msgObject;
+
+@end
+
+@implementation TempObject
+
+- (void)dealloc
+{
+    NSLog(@"%s",__FUNCTION__);// 若 msgObject正在释放，objc_loadWeakRetained是获取不了对象。
+}
+
+@end
+
+#pragma mark -
+
 @interface MsgObject ()
-@property (strong, nonatomic) NSSet *subSet;
+@property (strong, nonatomic) TempObject *tempObject;
 
 @end
 
 @implementation MsgObject
 
+- (void)dealloc
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        _subSet = [NSSet setWithObjects:@"Holy", @"Shit", nil];
+        _tempObject = [[TempObject alloc] init];
+        _tempObject.msgObject = self;
     }
     return self;
 }
@@ -44,6 +61,8 @@
 }
 
 @end
+
+#pragma mark -
 
 @implementation MsgObject (Catagory)
 
