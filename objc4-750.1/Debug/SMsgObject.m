@@ -19,6 +19,7 @@ static void ResolveMethod(id object, SEL sel){
  NSMutableArray[继承NSArray特性]：
     大致数据结构：
         struct {
+            _mutations  //修改标记“*** Collection <__NSArrayM: 0x1002076b0> was mutated while being enumerated.”
             _used   //已使用的内存空间计数
             _list   //内存空间首地址指针
             _size   //内存空间大小
@@ -116,14 +117,49 @@ static void ResolveMethod(id object, SEL sel){
     if (self) {
         @autoreleasepool {
             /*
-             __bridge: 适用于OC与C变量、OC对象与Core Foundation对象相互之间的转换，但内存的本身拥有关系不变。
-             __bridge_retained: 适用于OC->C变量、OC对象->Core Foundation对象的转换，内存的本身拥有关系变为后者。
-             __bridge_transfer: 适用于C变量->OC、Core Foundation对象->OC对象的转换，内存的本身拥有关系变为后者，移除前着的指针。
+             __bridge:
+                MRC{
+                    id obj = [[NSObject alloc] init];
+                    void *p = (void *)obj;
+                    id q = (id)p;
+                }
+                ARC{
+                    id obj = [[NSObject alloc] init];
+                    void *p = (__bridge void *)obj; //此时若obj被释放，p会成为野指针.
+                }
+             
+             __bridge_retained:
+                MRC{
+                    id obj = [[NSObject alloc] init];
+                    void *p = (void *)[obj retain];
+                    [obj release];
+                }
+                ARC{
+                    id obj = [[NSObject alloc] init];
+                    void *p = (__bridge_retained void *)obj;    //此时p是对象的拥有者，p手动管理内存释放.
+                }
+             
+             __bridge_transfer:
+                MRC{
+                    id obj = [[NSObject alloc] init];
+                    void *p = (void *)[obj retain];
+                    [obj release];
+             
+                    id q = (id)p;
+                    [q retain];
+                    [p release];
+                }
+                ARC{
+                    id obj = [[NSObject alloc] init];
+                    void *p = (__bridge_retained void *)obj;
+             
+                    id q = (__bridge_transfer id)p; //此时q是对象的拥有者，q的内存释放由系统管理.
+                }
              */
             
             NSString *charArray[] = {@"Fuck", @"Down"};
             CFArrayRef arrayRef = CFArrayCreate(kCFAllocatorDefault, (void *)charArray, (CFIndex)2, NULL);
-            _superArray = CFBridgingRelease(arrayRef);  //_superArray = (__bridge_transfer NSArray *)arrayRef
+            _superArray = CFBridgingRelease(arrayRef);
             _subSet = [NSSet setWithObjects:@"Holy", @"Shit", nil];
         }
         NSLog(@"%@",_superArray.description);
