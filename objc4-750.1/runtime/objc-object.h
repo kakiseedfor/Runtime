@@ -1186,6 +1186,8 @@ getReturnDisposition()
 static ALWAYS_INLINE void 
 setReturnDisposition(ReturnDisposition disposition)
 {
+    // TLS(Thread Local Storage),某个线程上的函数调用栈上相邻两个函数对 TLS 进行了存取，这中间肯定不会有别的程序『插手』,
+    // 不需要判断考虑是针对哪个对象的 Disposition 进行存取，因为当前线程上下文中只处理唯一的对象，保证不会乱掉.
     tls_set_direct(RETURN_DISPOSITION_KEY, (void*)(uintptr_t)disposition);
 }
 
@@ -1197,7 +1199,7 @@ static ALWAYS_INLINE bool
 prepareOptimizedReturn(ReturnDisposition disposition)
 {
     assert(getReturnDisposition() == ReturnAtPlus0);
-
+    // __builtin_return_address(0) 获取当前函数返回地址，传入 callerAcceptsOptimizedReturn 判断调用方是否紧接着调用了 objc_retainAutoreleasedReturnValue 或者 objc_unsafeClaimAutoreleasedReturnValue
     if (callerAcceptsOptimizedReturn(__builtin_return_address(0))) {
         if (disposition) setReturnDisposition(disposition);
         return true;

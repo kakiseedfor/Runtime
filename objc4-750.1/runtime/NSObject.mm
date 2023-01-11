@@ -1953,6 +1953,7 @@ objc_retainAutoreleaseAndReturn(id obj)
 id 
 objc_autoreleaseReturnValue(id obj)
 {
+    // ReturnAtPlus1 表示倾向直接把对象返回，这样就不需要调用 objc_autorelease()，优化性能
     if (prepareOptimizedReturn(ReturnAtPlus1)) return obj;
 
     return objc_autorelease(obj);
